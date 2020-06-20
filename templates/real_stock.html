@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+{% block content %}
+     <script>
+  $(function () {
+    $("#example1").DataTable();
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">沪深A股数据</h3>
+            <h3 style="margin-left: 20px;color: #00c054" class="card-title"> 温馨提示：点击<span color="red">代码、名称</span>进入头寸规模决策；
+                点击<span color="red">昨收</span>进入收盘价线性模拟走势</h3>
+        </div>
+            <!-- /.card-header -->
+            <div class="card-body table-responsive p-0" style="height: 500px;">
+              <table id="example2"border="1" class="table  table-head-fixed">
+                <thead>
+                <tr >
+                    <th style="width: 10px">序号</th>
+                    <th>代码</th>
+                    <th >名称</th>
+                    <th>最新价</th>
+                    <th>最高</th>
+                    <th>最低</th>
+                    <th>涨跌幅</th>
+                    <th>涨跌额</th>
+                    <th>今开</th>
+                    <th>昨收</th>
+                    <th>成交量(手)</th>
+                    <th>成交额(万)</th>
+                    <th>振幅</th>
+                    <th>量比</th>
+                    <th>换手率</th>
+                    <th>市盈率</th>
+                    <th>市净率</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in real_stock_list %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td><a href="/buy_decision?code='{{ x.f12 }}'&name='{{ x.f14 }}">{{ x.f12 }}</a></td>
+                        <td><a href="/buy_decision?code='{{ x.f12 }}'&name='{{ x.f14 }}">{{ x.f14 }}</a></td>
+
+                        {% if x.f2 > x.f18%}
+                            <td style="color: red">{{ x.f2 }}</td>
+                        {% elif x.f2 == x.f18%}
+                            <td style="color: #b1bbc4">{{ x.f2 }}</td>
+                        {% else %}
+                            <td style="color: lawngreen">{{ x.f2 }}</td>
+                        {% endif %}
+
+                        {% if x.f15 > x.f18%}
+                            <td style="color: red">{{ x.f15 }}</td>
+                        {% elif x.f15 == x.f18 %}
+                            <td style="color: #b1bbc4">{{ x.f15 }}</td>
+                        {% else %}
+                            <td style="color: lawngreen">{{ x.f15 }}</td>
+                        {% endif %}
+
+                        {% if x.f16 > x.f18%}
+                            <td style="color: red">{{ x.f16 }}</td>
+                        {% elif x.f16 == x.f18 %}
+                            <td style="color:  #b1bbc4">{{ x.f16 }}</td>
+                        {% else  %}
+                            <td style="color: lawngreen">{{ x.f16 }}</td>
+                        {% endif %}
+
+                        {% if x.f3 >'0' %}
+                            <td style="color: red">{{ x.f3 }}%</td>
+                        {% elif x.f3 =='0' %}
+                            <td style="color: #b1bbc4">{{ x.f3 }}%</td>
+                        {% elif x.f3 =='-' %}
+                            <td style="color: #b1bbc4">{{ x.f3 }}</td>
+                        {% else %}
+                            <td style="color: lawngreen">{{ x.f3 }}%</td>
+                        {% endif %}
+
+                        {% if x.f4 >'0' %}
+                            <td style="color: red">{{ x.f4 }}</td>
+                        {% elif x.f4 =='0' %}
+                            <td style="color: #b1bbc4">{{ x.f4 }}</td>
+                        {% else  %}
+                            <td style="color: lawngreen">{{ x.f4 }}</td>
+                        {% endif %}
+                        {% if x.f17 > x.f18 %}
+                            <td style="color: red">{{ x.f17 }}</td>
+                        {% elif x.f17 == x.f18 %}
+                            <td style="color: #b1bbc4">{{ x.f17 }}</td>
+                        {% else  %}
+                            <td style="color: lawngreen">{{ x.f17 }}</td>
+                        {% endif %}
+                        <td><a href="/kpj_fx?code='{{ x.f12 }}'">{{ x.f18 }}</a></td>
+                        <td>{{ x.f5}}</td>
+                        <td>{{ x.f6 }}</td>
+                        {% if x.f7 =='-' %}
+                            <td>{{ x.f7 }}</td>
+                        {% else %}
+                            <td>{{ x.f7 }}%</td>
+                        {% endif %}
+
+                        <td>{{ x.f10 }}</td>
+                        <td>{{ x.f8 }}</td>
+                        <td>{{ x.f9 }}</td>
+                        <td>{{ x.f23 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

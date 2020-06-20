@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block content %}
+     <script>
+  $(function () {
+    $("#example3").DataTable();
+    $('#example2').DataTable({
+      "paging": true,
+      "lengthChange": false,
+      "searching": true,
+      "ordering": true,
+      "info": true,
+      "autoWidth": false,
+    });
+  });
+</script>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">行业分类</h3>
+
+        </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+
+              <table id="example2"border="1" class="table table-bordered table-striped">
+                <thead>
+                <tr >
+                    <th>序号</th>
+                    <th>行业类别</th>
+                    <th>代码</th>
+                    <th >名称</th>
+                    <th>开始日期</th>
+                    <th>结束日期</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for x in labe_list %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ x.label }}</td>
+                        <td>{{ x.code }}</td>
+                        <td>{{ x.stcok_name }}</td>
+                        <td>{{ x.create_time }}</td>
+                        <td>{{ x.end_time }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,525 @@
+{% extends 'base.html' %}
+{% block content %}
+    <script type="text/javascript">
+        function changeBuy(value) {
+            var N = Number(document.getElementById('N').innerText);
+            var buy1 = Number(value);
+            if (value <= 0) {
+                document.getElementById('buy2').innerText = '-';
+                document.getElementById('buy3').innerText = '-';
+                document.getElementById('buy4').innerText = '-';
+                document.getElementById('zhisun').innerText = '-';
+            } else {
+                document.getElementById('buy2').innerText = buy1 + 0.5 * N;
+                document.getElementById('buy3').innerText = buy1 + N;
+                document.getElementById('buy4').innerText = buy1 + 1.5 * N;
+                var zhisun = buy1 - 2 * N;
+                if (zhisun >= 0) {
+                    document.getElementById('zhisun').innerText = zhisun;
+                } else {
+                    document.getElementById('zhisun').innerText = '-';
+                }
+            }
+
+        }
+    </script>
+
+    <hr>
+    <h2 style="margin-left: 5%">入市决策</h2>
+    <div>
+        <form action="/buy_decision" method="post" style="float: right" class="form-inline ml-15">
+            <div class="input-group input-group-sm">
+                股票代码:<input class="form-control form-control-navbar" name="code" type="text" value="{{ infos.code }}"
+                            placeholder="输入股票代码">
+                账户净资产:<input class="form-control form-control-navbar" name="maney" type="text" value="{{ infos.maney }}"
+                             placeholder="输入账户净资产">
+                <div class="input-group-append">
+                    <button class="btn btn-navbar" type="submit">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="card-body">
+        <table border="0" width="100%" style="margin-top: 20px">
+            <tr>
+                <td style="width: 15%">股票代码</td>
+                <td style="width: 15%">{{ infos.code }}</td>
+                <td style="width: 15%">股票名称</td>
+                <td style="width: 15%">{{ infos.name }}</td>
+
+
+                <td style="width: 20%">头寸单位</td>
+                <td style="width: 20%;color: #0000FF">{{ infos.unit }}</td>
+            </tr>
+            <tr>
+                <td>今开</td>
+                {% if  infos.JK %}
+                    {% if infos.JK > infos.ZSP %}
+                        <td style="color: red">{{ infos.JK }}</td>
+                    {% elif infos.JK == infos.ZSP %}
+                        <td style="color:black">{{ infos.JK }}</td>
+                    {% else %}
+                        <td style="color: green">{{ infos.JK }}</td>
+                    {% endif %}
+                {% else %}
+                    <td>{{ infos.JK }}</td>
+                {% endif %}
+
+                <td>账户净资产</td>
+                <td style="color: #FFBF00">{{ infos.maney }}</td>
+
+                <td>第一个买入单位(可自定义)</td>
+                <td><input type="number" id="buu1" value="{{ infos.buy1 }}" oninput="changeBuy(value)"></td>
+
+            </tr>
+            <tr>
+                <td>最新价</td>
+                {% if infos.new_price %}
+                    {% if infos.new_price > infos.ZSP %}
+                        <td style="color: red">{{ infos.new_price }}</td>
+                    {% elif infos.new_price == infos.ZSP %}
+                        <td style="color:black">{{ infos.new_price }}</td>
+                    {% else %}
+                        <td style="color: green">{{ infos.new_price }}</td>
+                    {% endif %}
+                {% else %}
+                    <td>{{ infos.new_price }}</td>
+                {% endif %}
+
+                <td style="width: 15%">真实波动幅度TR</td>
+                <td style="width: 15%">{{ infos.TR }}</td>
+
+                <td>第二个买入单位</td>
+                <td><span id="buy2" style="color: red">{{ infos.buy2 }}</span></td>
+            </tr>
+
+            <tr>
+                <td>昨收</td>
+                <td>{{ infos.ZSP }}</td>
+                <td>市场的绝对波动幅度</td>
+                <td>{{ infos.ATR }}</td>
+                <td>第三个买入单位</td>
+                <td><span id="buy3" style="color: red">{{ infos.buy3 }}</span></td>
+
+            </tr>
+            <tr>
+                <td>最高价</td>
+                {% if infos.H %}
+                    {% if infos.H > infos.ZSP %}
+                        <td style="color: red">{{ infos.H }}</td>
+                    {% elif infos.H == infos.ZSP %}
+                        <td style="color:black">{{ infos.H }}</td>
+                    {% else %}
+                        <td style="color: green">{{ infos.H }}</td>
+                    {% endif %}
+                {% else %}
+                    <td>{{ infos.H }}</td>
+                {% endif %}
+
+                <td>波动性指标N</td>
+                <td><span id="N" color="red"> {{ infos.N }}</span></td>
+
+                <td>第四个买入单位</td>
+                <td><span id="buy4" style="color: red">{{ infos.buy4 }}</span></td>
+
+            </tr>
+            <tr>
+                <td>最低价</td>
+                {% if infos.L %}
+                    {% if infos.L > infos.ZSP %}
+                        <td style="color: red">{{ infos.L }}</td>
+                    {% elif infos.L == infos.ZSP %}
+                        <td style="color:black">{{ infos.L }}</td>
+                    {% else %}
+                        <td style="color: #00b44e">{{ infos.L }}</td>
+                    {% endif %}
+                {% else %}
+                    <td>{{ infos.L }}</td>
+                {% endif %}
+
+                <td>真实波动幅度均值</td>
+                <td style="color: #FF0040">{{ infos.avr_ATR }}</td>
+                <td>止损退出</td>
+                <td><span id="zhisun" style="color: #00b44e">{{ infos.zhisun }}</span></td>
+            </tr>
+            <tr>
+                <td>20日最高</td>
+                <td style="color: red">{{ infos.max_20 }}</td>
+                <td>上通道ATR_UP</td>
+                <td style="color: #FF0040">{{ infos.ATR_H }}</td>
+                <td>下通道ATR_Lower</td>
+                <td><span id="zhisun" style="color: #31B404">{{ infos.ATR_L }}</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <hr>
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-6">
+            <!-- AREA CHART -->
+            <div class="card card-primary">
+              <div class="card-header">
+                <h3 class="card-title">K线</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart">
+                  <div id="container" style="min-height: 350px; height: 350px; max-height: 350px; max-width: 100%;"></div>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+
+     <!-- /.col (LEFT) -->
+          <div class="col-md-6">
+            <!-- LINE CHART -->
+            <div class="card card-info">
+              <div class="card-header">
+                <h3 class="card-title">线性走势</h3>
+
+                <div class="card-tools">
+                  <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-minus"></i>
+                  </button>
+                  <button type="button" class="btn btn-tool" data-card-widget="remove"><i class="fas fa-times"></i></button>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart">
+                  <div id="sp" style="min-height: 350px; height: 350px; max-height: 350px; max-width: 100%;"></div>
+                </div>
+              </div>
+              <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+        </div>
+      </div>
+    </section>
+{#    <h2 style="margin-left: 5%">可视化分析</h2>#}
+{#    <div class="card-body">#}
+{#        <div id="container" style="height: 400px;width: 95%"></div>#}
+{#        <hr>#}
+{#        <div id="sp"#}
+{#             style="min-height: 250px; height: 400px; max-height: 1000px; max-width: 100%;">#}
+{#        </div>#}
+{#    </div>#}
+
+    <script type="text/javascript">
+        var dom = document.getElementById("container");
+        var myChart = echarts.init(dom);
+        var app = {};
+        option = null;
+        var k_data = {{ k_data_list |safe }};
+        var rawData = k_data.reverse();
+
+        function calculateMA(dayCount, data) {
+            var result = [];
+            for (var i = 0, len = data.length; i < len; i++) {
+                if (i < dayCount) {
+                    result.push('-');
+                    continue;
+                }
+                var sum = 0;
+                for (var j = 0; j < dayCount; j++) {
+                    sum += data[i - j][1];
+                }
+                result.push(sum / dayCount);
+            }
+            return result;
+        }
+        function calculateATR_UP(dayCount, data) {
+
+            var result = [];
+            for (var i = 0, len = data.length; i < len; i++) {
+                if (i < dayCount) {
+                    result.push('-');
+                    continue;
+                }
+                var sum = 0;
+                var ATR = 0;
+                for (var j = 0; j < dayCount; j++) {
+                    sum += data[i - j][1];
+                    ATR += Math.max(data[i - j][3] - data[i - j][2], data[i - j][3] - data[i - j][1], data[i - j][1] - data[i - j][2]);
+                }
+                result.push(sum / dayCount + 7 * (ATR / dayCount));
+            }
+            return result;
+        };
+        function calculateATR_Lower(dayCount, data) {
+            var result = [];
+            for (var i = 0, len = data.length; i < len; i++) {
+                if (i < dayCount) {
+                    result.push('-');
+                    continue;
+                }
+                var sum = 0;
+                var ATR = 0;
+                for (var j = 0; j < dayCount; j++) {
+                    sum += data[i - j][1];
+                    ATR += Math.max(data[i - j][3] - data[i - j][2], data[i - j][3] - data[i - j][1], data[i - j][1] - data[i - j][2]);
+                }
+                result.push(sum / dayCount - 3 * (ATR / dayCount));
+            }
+            return result;
+        }
+
+        var dates = rawData.map(function (item) {
+            return item[0];
+        });
+
+        var data = rawData.map(function (item) {
+            return [+item[1], +item[2], +item[5], +item[6]];
+        });
+        var option = {
+            backgroundColor: '',
+            legend: {
+                data: ['K线及ATR通道', 'MA5', 'MA10', 'MA25','MA100', 'MA350', 'ATR_UP', 'ATR_Lower'],
+                inactiveColor: '#777',
+                textStyle: {
+                    color: '#000000'
+                }
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    animation: false,
+                    type: 'cross',
+                    lineStyle: {
+                        color: '#376df4',
+                        width: 2,
+                        opacity: 1
+                    }
+                }
+            },
+            xAxis: {
+                type: 'category',
+                data: dates,
+                axisLine: {lineStyle: {color: '#8392A5'}}
+            },
+            yAxis: {
+                scale: true,
+                axisLine: {lineStyle: {color: '#8392A5'}},
+                splitLine: {show: false}
+            },
+            grid: {
+                bottom: 80
+            },
+            dataZoom: [{
+                textStyle: {
+                    color: '#8392A5'
+                },
+                handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+                handleSize: '80%',
+                dataBackground: {
+                    areaStyle: {
+                        color: '#8392A5'
+                    },
+                    lineStyle: {
+                        opacity: 0.8,
+                        color: '#8392A5'
+                    }
+                },
+                handleStyle: {
+                    color: '#000000',
+                    shadowBlur: 3,
+                    shadowColor: 'rgba(0, 0, 0, 0.6)',
+                    shadowOffsetX: 2,
+                    shadowOffsetY: 2
+                }
+            }, {
+                type: 'inside'
+            }],
+            animation: false,
+            series: [
+                {
+                    type: 'candlestick',
+                    name: 'K线及ATR通道',
+                    data: data,
+                    itemStyle: {
+                        color: '#FD1050',
+                        color0: '#0CF49B',
+                        borderColor: '#FD1050',
+                        borderColor0: '#0CF49B'
+                    }
+                },
+                {
+                    name: 'MA5',
+                    type: 'line',
+                    data: calculateMA(5, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 1
+                    }
+                },
+                {
+                    name: 'MA10',
+                    type: 'line',
+                    data: calculateMA(10, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 1
+                    }
+                },
+                {
+                    name: 'MA25',
+                    type: 'line',
+                    data: calculateMA(25, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 1
+                    }
+                },
+                {
+                    name: 'MA100',
+                    type: 'line',
+                    data: calculateMA(100, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 1
+                    }
+                },
+                {
+                    name: 'MA350',
+                    type: 'line',
+                    data: calculateMA(350, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 1
+                    }
+                },
+                {
+                    name: 'ATR_UP',
+                    type: 'line',
+                    data: calculateATR_UP(350, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 2
+                    }
+                },
+                {
+                    name: 'ATR_Lower',
+                    type: 'line',
+                    data: calculateATR_Lower(350, data),
+                    smooth: true,
+                    showSymbol: false,
+                    lineStyle: {
+                        width: 2
+                    }
+                }
+            ]
+        };
+        ;
+        if (option && typeof option === "object") {
+            myChart.setOption(option, true);
+        }</script>
+    <script type="text/javascript">
+        var doms = document.getElementById("sp");
+        var myCharts = echarts.init(doms);
+        var apps = {};
+        options = null;
+        var datas ={{ sp_data |safe }}
+        // See https://github.com/ecomfe/echarts-stat
+        var myRegressions = ecStat.regression('exponential', datas);
+
+        myRegressions.points.sort(function (a, b) {
+            return a[0] - b[0];
+        });
+
+        options = {
+            title: {
+                text: '350日收盘价线性模拟走势',
+                sublink: 'https://github.com/ecomfe/echarts-stat',
+                left: 'center'
+            },
+            tooltip: {
+                trigger: 'axis',
+                axisPointer: {
+                    type: 'cross'
+                }
+            },
+            xAxis: {
+                type: 'value',
+                name:"天数",
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed'
+                    }
+                },
+                splitNumber: 20
+            },
+            yAxis: {
+                type: 'value',
+                name:"收盘价",
+                splitLine: {
+                    lineStyle: {
+                        type: 'dashed'
+                    }
+                }
+            },
+            series: [{
+                name: 'scatter',
+                type: 'scatter',
+                label: {
+                    emphasis: {
+                        show: true,
+                        position: 'left',
+                        textStyle: {
+                            color: 'blue',
+                            fontSize: 16
+                        }
+                    }
+                },
+                data: datas
+            }, {
+                name: 'line',
+                type: 'line',
+                showSymbol: false,
+                smooth: true,
+                data: myRegressions.points,
+                markPoint: {
+                    itemStyle: {
+                        normal: {
+                            color: 'transparent'
+                        }
+                    },
+                    label: {
+                        normal: {
+                            show: true,
+                            position: 'left',
+                            formatter: myRegressions.expression,
+                            textStyle: {
+                                color: '#333',
+                                fontSize: 14
+                            }
+                        }
+                    },
+                    data: [{
+                        coord: myRegressions.points[myRegressions.points.length - 1]
+                    }]
+                }
+            }]
+        };
+        ;
+        if (options && typeof options === "object") {
+            myCharts.setOption(options, true);
+        }
+    </script>
+
+{% endblock %}
